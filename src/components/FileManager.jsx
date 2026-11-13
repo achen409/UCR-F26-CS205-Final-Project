@@ -229,8 +229,7 @@ function FileManager() {
   },
   "settings": {
     "theme": "light",
-    "accent": "indigo",
-    "language": "en"
+    "accent": "indigo"
   }
 }`}
           </pre>

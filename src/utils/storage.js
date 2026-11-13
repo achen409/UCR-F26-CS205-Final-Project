@@ -18,7 +18,6 @@ export const DEFAULT_DATA = {
   settings: {
     theme: 'light',
     accent: 'indigo',
-    language: 'en',
     onboardingComplete: false,
     moodReminders: [],
   },

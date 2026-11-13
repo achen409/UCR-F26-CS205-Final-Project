@@ -86,25 +86,6 @@ function SettingsPanel() {
       </section>
       <section className="bg-white rounded-lg shadow p-6 space-y-4">
         <h3 className="text-lg font-semibold">
-          Language
-        </h3>
-        <select
-          value={settings.language || 'en'}
-          onChange={e => updateSettings({
-            language: e.target.value,
-          })}
-          className="w-full border rounded-lg p-3"
-          aria-label="Application language"
-        >
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
-        <p className="text-xs text-gray-500">
-          Language preference is saved with your data.
-        </p>
-      </section>
-      <section className="bg-white rounded-lg shadow p-6 space-y-4">
-        <h3 className="text-lg font-semibold">
           Mood Reminders
         </h3>
         <p className="text-sm text-gray-500">

@@ -1,4 +1,5 @@
 # AI Usage
+
 I stuck with the default trial of ChatGPT as my coding agent. My logic was that if I could complete this project with a simpler and cheaper coding agent, I would be able to use more advanced agents to their full potential. This meant that I would have to lean more into prompt engineering than having a built-in agent in my IDE. I rather enjoyed having this layer of separation between repo and agent because it meant that I was in control of all input and output from the agent.
 
 As I am very rusty with this framework, ChatGPT helped immensly with coding what I envisioned. I gave it the project's structure only with the contents of all relevant files (src folder, how the json file was formatted, etc) and the additions I wanted to see. In the prompt, I instructed the agent to tell me which files were changed and their changes. It also did not hurt to add a small sentence stating "make as little change as possible" and "be brief".

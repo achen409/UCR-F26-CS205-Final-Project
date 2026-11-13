@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { t } from './utils/i18n'
 import { HealthDataProvider, useHealthData } from './context/HealthDataContext'
 
 import MoodTracker from './modules/MoodTracker'
@@ -17,14 +16,13 @@ import ReminderManager from './components/ReminderManager'
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const { settings, updateSettings } = useHealthData()
-  const language = settings.language || 'en'
   const tabs = [
-  ['dashboard', t('dashboard', language)],
-  ['trackers', t('trackers', language)],
-  ['analytics', t('analytics', language)],
-  ['history', t('history', language)],
-  ['data', t('data', language)],
-  ['settings', t('settings', language)],
+  ['dashboard', 'Dashboard'],
+  ['trackers', 'Trackers'],
+  ['analytics', 'Analytics'],
+  ['history', 'History'],
+  ['data', 'Data'],
+  ['settings', 'Settings'],
 ]
 
   useEffect(() => {
@@ -39,7 +37,7 @@ function AppContent() {
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold app-heading mb-2">
-            {t('title', language)}
+            Health & Wellness Tracker
           </h1>
           <p className="app-muted">
             Track your mood, sleep, nutrition, activity, and overall wellness.
