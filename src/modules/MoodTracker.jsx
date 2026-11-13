@@ -13,6 +13,7 @@ const MOOD_LABELS = {
 function MoodTracker() {
   const { moodEntries, addMoodEntry, deleteMoodEntry } = useHealthData()
   const [selectedMood, setSelectedMood] = useState(null)
+  const [note, setNote] = useState('')
 
   const handleSelectMood = (mood) => {
     setSelectedMood(mood)
@@ -29,10 +30,12 @@ function MoodTracker() {
       timestamp: now.toISOString(),
       date: getTodayFormatted(),
       time: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+      note: note.trim()
     }
 
     addMoodEntry(newEntry)
     setSelectedMood(null)
+    setNote('')
   }
 
   const latestEntry = moodEntries.length > 0
@@ -70,6 +73,15 @@ function MoodTracker() {
           </button>
         ))}
       </div>
+
+      <textarea
+        value={note}
+        onChange={e => setNote(e.target.value)}
+        placeholder="Add a note about how you're feeling (optional)..."
+        aria-label="Mood journal note"
+        rows={3}
+        className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+      />
 
       <button
         onClick={handleSubmit}

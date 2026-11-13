@@ -1,81 +1,112 @@
-import { useState } from 'react'
-import { HealthDataProvider } from './context/HealthDataContext'
+import { useState, useEffect } from 'react'
+import { t } from './utils/i18n'
+import { HealthDataProvider, useHealthData } from './context/HealthDataContext'
+
 import MoodTracker from './modules/MoodTracker'
 import DailyGraph from './components/DailyGraph'
 import WeeklyGraph from './components/WeeklyGraph'
 import HistoryView from './components/HistoryView'
 import FileManager from './components/FileManager'
 
-function App() {
+import WellnessTrackers from './components/WellnessTrackers'
+import AnalyticsDashboard from './components/AnalyticsDashboard'
+import SettingsPanel from './components/SettingsPanel'
+import Onboarding from './components/Onboarding'
+import ReminderManager from './components/ReminderManager'
+
+function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const { settings, updateSettings } = useHealthData()
+  const language = settings.language || 'en'
+  const tabs = [
+  ['dashboard', t('dashboard', language)],
+  ['trackers', t('trackers', language)],
+  ['analytics', t('analytics', language)],
+  ['history', t('history', language)],
+  ['data', t('data', language)],
+  ['settings', t('settings', language)],
+]
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.theme = settings.theme || 'light'
+    root.dataset.accent = settings.accent || 'indigo'
+  }, [settings.theme, settings.accent])
 
   return (
-    <HealthDataProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <header className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Mood Tracking App
-            </h1>
-            <p className="text-gray-600">
-              Track how you feel over time with a simple 1–5 mood scale
-            </p>
-          </header>
-
-          <div className="mb-6 border-b border-gray-200">
-            <nav className="flex space-x-8">
+    <div className="min-h-screen app-background">
+      <ReminderManager />
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+        <header className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold app-heading mb-2">
+            {t('title', language)}
+          </h1>
+          <p className="app-muted">
+            Track your mood, sleep, nutrition, activity, and overall wellness.
+          </p>
+        </header>
+        <nav className="mb-6 border-b app-border overflow-x-auto" aria-label="Main navigation">
+          <div className="flex gap-2 min-w-max">
+            {tabs.map(([id, label]) => (
               <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'dashboard'
+                key={id}
+                onClick={() => setActiveTab(id)}
+                aria-current={activeTab === id ? 'page' : undefined}
+                className={`py-3 px-3 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === id
                     ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent app-muted hover:text-indigo-500'
                 }`}
               >
-                Dashboard
+                {label}
               </button>
-              <button
-                onClick={() => setActiveTab('history')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'history'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                History
-              </button>
-              <button
-                onClick={() => setActiveTab('data')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'data'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Data Management
-              </button>
-            </nav>
+            ))}
           </div>
+        </nav>
 
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <MoodTracker />
-                <DailyGraph />
-                <WeeklyGraph />
-              </div>
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <MoodTracker />
+              <DailyGraph />
+              <WeeklyGraph />
             </div>
-          )}
+            <WellnessTrackers compact />
+          </div>
+        )}
+        {activeTab === 'trackers' && (
+          <WellnessTrackers />
+        )}
+        {activeTab === 'analytics' && (
+          <AnalyticsDashboard />
+        )}
+        {activeTab === 'history' && (
+          <HistoryView />
+        )}
+        {activeTab === 'data' && (
+          <FileManager />
+        )}
+        {activeTab === 'settings' && (
+          <SettingsPanel />
+        )}
 
-          {activeTab === 'history' && (
-            <HistoryView />
-          )}
-
-          {activeTab === 'data' && (
-            <FileManager />
-          )}
-        </div>
       </div>
+
+      {!settings.onboardingComplete && (
+        <Onboarding
+          onComplete={() => updateSettings({
+            onboardingComplete: true,
+          })}
+        />
+      )}
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <HealthDataProvider>
+      <AppContent />
     </HealthDataProvider>
   )
 }

@@ -1,82 +1,69 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { loadData, saveData, saveFileHandleInfo, getFileHandleInfo } from '../utils/storage'
+import { loadData, saveData, normalizeData, saveFileHandleInfo, getFileHandleInfo } from '../utils/storage'
 import { createFile, openFile, writeFile, readFile } from '../utils/fileOperations'
 
 const HealthDataContext = createContext()
 
 export function HealthDataProvider({ children }) {
-  const [moodEntries, setMoodEntries] = useState([])
+  const [healthData, setHealthData] = useState(loadData)
   const [isLoaded, setIsLoaded] = useState(false)
   const [fileHandle, setFileHandle] = useState(null)
-  const [fileStatus, setFileStatus] = useState('none') // 'none', 'saving', 'saved', 'error'
+  const [fileStatus, setFileStatus] = useState('none')
   const fileHandleRef = useRef(null)
 
-  // Load data on startup
   useEffect(() => {
     async function initialize() {
-      // Load from localStorage first
       const loaded = loadData()
-      setMoodEntries(loaded.moodEntries)
+      setHealthData(loaded)
       setIsLoaded(true)
-      
-      // Try to set up file auto-save
+
       const handleInfo = getFileHandleInfo()
+
       if (handleInfo && 'showOpenFilePicker' in window) {
         const handle = await openFile()
+
         if (handle) {
           fileHandleRef.current = handle
           setFileHandle(handle)
-          
-          // Load data from file if it's newer
           const fileData = await readFile(handle)
-          if (fileData?.moodEntries) {
+
+          if (fileData) {
+            const normalized = normalizeData(fileData)
+
             const fileDate = fileData.lastSaved ? new Date(fileData.lastSaved) : null
-            const storageDate = loaded.moodEntries.length > 0 
-              ? new Date(Math.max(...loaded.moodEntries.map(e => e.id))) 
-              : null
-            
+
+            const storageDate = loaded.moodEntries.length > 0 ? new Date(Math.max(loaded.moodEntries.map(e => e.id))) : null
+
             if (!storageDate || (fileDate && fileDate > storageDate)) {
-              setMoodEntries(fileData.moodEntries)
-              saveData(fileData.moodEntries)
+              setHealthData(normalized)
+              saveData(normalized)
             }
           }
         }
-      } else {
-        // Auto-setup file on first use
-        const handle = await createFile()
-        if (handle) {
-          fileHandleRef.current = handle
-          setFileHandle(handle)
-          saveFileHandleInfo(handle)
-          await writeFile(handle, {
-            moodEntries: loaded.moodEntries,
-            lastSaved: new Date().toISOString()
-          })
-        }
       }
     }
-    
+
     initialize()
   }, [])
 
-  // Auto-save to localStorage and file when data changes
   useEffect(() => {
-    if (isLoaded) {
-      saveData(moodEntries)
-      saveToFile()
-    }
-  }, [moodEntries, isLoaded])
+    if (!isLoaded) return
+
+    saveData(healthData)
+    saveToFile()
+  }, [healthData, isLoaded])
 
   async function saveToFile() {
     const handle = fileHandleRef.current
     if (!handle) return
 
     setFileStatus('saving')
+
     const success = await writeFile(handle, {
-      moodEntries,
-      lastSaved: new Date().toISOString()
+      ...healthData,
+      lastSaved: new Date().toISOString(),
     })
-    
+
     if (success) {
       setFileStatus('saved')
       setTimeout(() => setFileStatus('none'), 2000)
@@ -88,60 +75,117 @@ export function HealthDataProvider({ children }) {
 
   async function setupFileHandle() {
     const handle = await createFile()
+
     if (handle) {
       fileHandleRef.current = handle
       setFileHandle(handle)
+
       saveFileHandleInfo(handle)
-      await saveToFile()
+
+      await writeFile(handle, {
+        ...healthData,
+        lastSaved: new Date().toISOString(),
+      })
+
       return true
     }
+
     return false
   }
 
   async function loadFromFile() {
     const handle = await openFile()
+
     if (handle) {
       fileHandleRef.current = handle
       setFileHandle(handle)
+
       saveFileHandleInfo(handle)
-      
+
       const data = await readFile(handle)
-      if (data?.moodEntries) {
-        setMoodEntries(data.moodEntries)
-        saveData(data.moodEntries)
+
+      if (data) {
+        setHealthData(normalizeData(data))
         return true
       }
     }
+
     return false
   }
 
-  const addMoodEntry = (entry) => {
-    setMoodEntries([...moodEntries, entry])
+  function addEntry(collection, entry) {
+    setHealthData(prev => ({
+      ...prev,
+      [collection]: [...prev[collection], entry],
+    }))
   }
 
-  const deleteMoodEntry = (id) => {
-    setMoodEntries(moodEntries.filter(entry => entry.id !== id))
+  function deleteEntry(collection, id) {
+    setHealthData(prev => ({
+      ...prev,
+      [collection]: prev[collection].filter(
+        entry => entry.id !== id
+      ),
+    }))
   }
 
-  const setAllData = (moodEntries) => {
-    setMoodEntries(moodEntries)
+  const addMoodEntry = entry => addEntry('moodEntries', entry)
+
+  const deleteMoodEntry = id => deleteEntry('moodEntries', id)
+
+  function updateSettings(updates) {
+    setHealthData(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        ...updates,
+      },
+    }))
   }
 
-  const exportData = () => {
-    const data = {
-      moodEntries,
+  function updateGoals(updates) {
+    setHealthData(prev => ({
+      ...prev,
+      goals: {
+        ...prev.goals,
+        ...updates,
+      },
+    }))
+  }
+
+  function setAllData(data) {
+    const normalized = Array.isArray(data)
+      ? normalizeData({ moodEntries: data })
+      : normalizeData(data)
+
+    setHealthData(normalized)
+  }
+
+  function exportData() {
+    return JSON.stringify({
+      ...healthData,
       exportedAt: new Date().toISOString(),
-    }
-    return JSON.stringify(data, null, 2)
+    }, null, 2)
   }
 
-  const importData = (jsonString) => {
+  function importData(jsonString) {
     try {
       const data = JSON.parse(jsonString)
-      if (data.moodEntries && Array.isArray(data.moodEntries)) {
-        setAllData(data.moodEntries)
+
+      if (
+        data &&
+        typeof data === 'object' &&
+        !Array.isArray(data) &&
+        (
+          Array.isArray(data.moodEntries) ||
+          Array.isArray(data.sleepEntries) ||
+          Array.isArray(data.waterEntries)
+        )
+      ) {
+        setAllData(data)
         return true
       }
+
       return false
     } catch (error) {
       console.error('Error importing data:', error)
@@ -152,14 +196,26 @@ export function HealthDataProvider({ children }) {
   return (
     <HealthDataContext.Provider
       value={{
-        moodEntries,
+        ...healthData,
+
+        healthData,
+
+        addEntry,
+        deleteEntry,
+
         addMoodEntry,
         deleteMoodEntry,
+
+        updateSettings,
+        updateGoals,
+
         exportData,
         importData,
         setAllData,
+
         setupFileHandle,
         loadFromFile,
+
         fileHandle,
         fileStatus,
       }}
@@ -171,8 +227,12 @@ export function HealthDataProvider({ children }) {
 
 export function useHealthData() {
   const context = useContext(HealthDataContext)
+
   if (!context) {
-    throw new Error('useHealthData must be used within HealthDataProvider')
+    throw new Error(
+      'useHealthData must be used within HealthDataProvider'
+    )
   }
+
   return context
 }

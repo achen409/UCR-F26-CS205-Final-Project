@@ -213,17 +213,26 @@ function FileManager() {
             Your JSON file should follow this structure:
           </p>
           <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-{`{
-  "moodEntries": [
-    {
-      "id": 1234567890,
-      "mood": 4,
-      "timestamp": "2024-01-15T12:00:00.000Z",
-      "time": "12:00 PM",
-      "date": "1/15/2024"
-    }
-  ]
-}`}
+          {`{
+            "moodEntries": [],
+            "sleepEntries": [],
+            "waterEntries": [],
+            "exerciseEntries": [],
+            "mealEntries": [],
+            "medications": [],
+            "medicationLogs": [],
+            "journalEntries": [],
+            "goals": {
+              "sleep": 8,
+              "water": 2000,
+              "exercise": 30
+            },
+            "settings": {
+              "theme": "light",
+              "accent": "indigo",
+              "language": "en"
+            }
+          }`}
           </pre>
         </div>
       </div>
