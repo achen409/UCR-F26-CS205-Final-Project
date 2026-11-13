@@ -39,13 +39,9 @@ function AnalyticsDashboard() {
       start.setDate(today.getDate() - 29)
     }
 
-    let end = endDate
-      ? new Date(`${endDate}T23:59:59`)
-      : today
+    let end = endDate ? new Date(`${endDate}T23:59:59`) : today
 
-    if (end < start) {
-      end = new Date(start)
-    }
+    if (end < start) end = new Date(start)
 
     const result = []
 
@@ -63,18 +59,11 @@ function AnalyticsDashboard() {
           ? entries.reduce((sum, e) => sum + e.value, 0) / entries.length
           : null
 
-      const moodAverage = average(
-        moods.map(e => ({ value: e.mood }))
-      )
-
-      const sleepAverage = average(
-        sleeps.map(e => ({ value: e.hours }))
-      )
-
+      const moodAverage = average(moods.map(e => ({ value: e.mood })))
+      const sleepAverage = average(sleeps.map(e => ({ value: e.hours })))
       const water = waterEntries
         .filter(e => e.date === date)
         .reduce((sum, e) => sum + e.amount, 0)
-
       const exercise = exerciseEntries
         .filter(e => e.date === date)
         .reduce((sum, e) => sum + e.duration, 0)
@@ -108,11 +97,9 @@ function AnalyticsDashboard() {
 
   const stats = useMemo(() => {
     const moodDays = dailyData.filter(d => d.mood !== null)
-
     const averageMood = moodDays.length
       ? moodDays.reduce((sum, d) => sum + d.mood, 0) / moodDays.length
       : 0
-
     const best = [...moodDays].sort((a, b) => b.mood - a.mood)[0]
     const worst = [...moodDays].sort((a, b) => a.mood - b.mood)[0]
 
@@ -133,18 +120,9 @@ function AnalyticsDashboard() {
 
     const meanMood = paired.reduce((s, d) => s + d.mood, 0) / paired.length
     const meanSleep = paired.reduce((s, d) => s + d.sleep, 0) / paired.length
-    const numerator = paired.reduce(
-      (s, d) => s + (d.mood - meanMood) * (d.sleep - meanSleep),
-      0
-    )
-    const moodVariance = paired.reduce(
-      (s, d) => s + (d.mood - meanMood) ** 2,
-      0
-    )
-    const sleepVariance = paired.reduce(
-      (s, d) => s + (d.sleep - meanSleep) ** 2,
-      0
-    )
+    const numerator = paired.reduce((s, d) => s + (d.mood - meanMood) * (d.sleep - meanSleep), 0)
+    const moodVariance = paired.reduce((s, d) => s + (d.mood - meanMood) ** 2, 0)
+    const sleepVariance = paired.reduce((s, d) => s + (d.sleep - meanSleep) ** 2, 0)
     const denominator = Math.sqrt(moodVariance * sleepVariance)
 
     if (denominator === 0) return null

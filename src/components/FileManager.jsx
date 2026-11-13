@@ -123,7 +123,7 @@ function FileManager() {
                   setTimeout(() => setImportSuccess(false), 3000)
                 }
               }}
-              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
             >
               Load from File
             </button>
@@ -159,7 +159,7 @@ function FileManager() {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium mb-2"
+              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
             >
               Select JSON File
             </button>
@@ -182,13 +182,13 @@ function FileManager() {
           <div className="flex gap-2">
             <button
               onClick={() => handleImport()}
-              className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
             >
               Import Data
             </button>
             <button
               onClick={handleClear}
-              className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
             >
               Clear All Data
             </button>
