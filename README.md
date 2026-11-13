@@ -1,5 +1,9 @@
 # CS205 Final Project (Fall 2026): AI-Assisted Feature Development
 
+## Deployed Link
+
+https://ucr-f26-cs-205-final-project.vercel.app
+
 ## Overview
 
 For this final project, you will use **AI coding agents** to extend a simple Mood Tracking web application into a more full-featured health and wellness platform. The base app lets users log their mood on a 1-5 scale, view daily/weekly graphs, and import/export data as JSON.
