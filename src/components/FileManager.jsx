@@ -123,7 +123,7 @@ function FileManager() {
                   setTimeout(() => setImportSuccess(false), 3000)
                 }
               }}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               Load from File
             </button>
@@ -214,25 +214,25 @@ function FileManager() {
           </p>
           <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
           {`{
-            "moodEntries": [],
-            "sleepEntries": [],
-            "waterEntries": [],
-            "exerciseEntries": [],
-            "mealEntries": [],
-            "medications": [],
-            "medicationLogs": [],
-            "journalEntries": [],
-            "goals": {
-              "sleep": 8,
-              "water": 2000,
-              "exercise": 30
-            },
-            "settings": {
-              "theme": "light",
-              "accent": "indigo",
-              "language": "en"
-            }
-          }`}
+  "moodEntries": [],
+  "sleepEntries": [],
+  "waterEntries": [],
+  "exerciseEntries": [],
+  "mealEntries": [],
+  "medications": [],
+  "medicationLogs": [],
+  "journalEntries": [],
+  "goals": {
+    "sleep": 8,
+    "water": 2000,
+    "exercise": 30
+  },
+  "settings": {
+    "theme": "light",
+    "accent": "indigo",
+    "language": "en"
+  }
+}`}
           </pre>
         </div>
       </div>
